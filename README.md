@@ -10,7 +10,16 @@ your page not only by accessing `https://example.org/doc/index.html`, but also
 `https://example.org/doc` and `https://example.org/doc/`, as this lambda will
 create two copies of `doc/index.html` key under `doc` and `doc/` keys.
 
-Requires these permissions to work with S3:
+## Setup
+
+Build and compress:
+
+    GOOS=linux GOARCH=amd64 go build -o main
+    zip -9 lambda.zip main
+
+Create a new AWS Lambda, picking the "Go 1.x" runtime. Change its handler name from default "hello" to "main" (binary name you built above), and upload lambda.zip file.
+
+It requires the usual permissions, e.g. `AWSLambdaBasicExecutionRole` AWS-managed role, plus these permissions to work with S3 (optionally limit with your bucket names):
 
     {
         "Version": "2012-10-17",
@@ -26,3 +35,5 @@ Requires these permissions to work with S3:
             }
         ]
     }
+
+Once Lambda is created and configured, go to S3 bucket settings, Properties → Event notifications → Create event notification. Enter `index.html` as a *Suffix*, and select `s3:ObjectCreated` events except for the `s3:ObjectCreated:Copy`. Pick your Lambda function created above as event destination.
