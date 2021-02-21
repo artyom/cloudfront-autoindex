@@ -44,3 +44,18 @@ It requires the usual permissions, e.g. `AWSLambdaBasicExecutionRole` AWS-manage
     }
 
 Once Lambda is created and configured, go to S3 bucket settings, Properties → Event notifications → Create event notification. Enter `index.html` as a *Suffix*, and select `s3:ObjectCreated` events except for the `s3:ObjectCreated:Copy`. Pick your Lambda function created above as event destination.
+
+## Caveats
+
+### Relative Links
+
+If an index.html page has relative links to other resources, such links may appear broken depending on which path you access such a page.
+
+For example, if you have an `/years/index.html` page that links to a `2021.html` file, such link will be resolved to `/years/2021.html` when you access the page `/years/index.html` or its automatically created copy at `/years/`. But if you access an automatically created copy at `/years` path, the browser will resolve such a relative link to just `/2021.html`.
+
+Consider using the [`<base>` element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base) to lock the base path for relative links.
+
+### Canonical Path
+
+Search engines may get confused on which page address is the primary one in the presence of such multiple copies. Their primary source choice may be different from yours.
+Use the [canonical link element](https://en.wikipedia.org/wiki/Canonical_link_element) on your page to set its main address, like `<link rel="canonical" href="…">`.
